@@ -1,13 +1,4 @@
-import os
-
-import discord
-import requests
-
-from dotenv import load_dotenv
-from discord import Embed, Intents, Interaction, Client
-from discord.ext import commands
-from discord.ui import Modal
-from discord.app_commands import CommandTree
+from dependencies import *
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -23,11 +14,13 @@ test_guild = discord.Object(id=GUILD)
 @client.event
 async def on_ready():
     print('Connected!')
+    # tree.remove_command("inspiration")
+    # tree.remove_command("poll")
     await tree.sync(guild=test_guild)
 
 
 @tree.command(guild=test_guild, description='Responds with a random inspirational quote.')
-async def inspiration(interaction):
+async def inspiration(interaction: Interaction) -> None:
     request = requests.request('get', 'https://zenquotes.io?api=random')
     response = request.json()[0]
     quote = f":sparkles: *{response['q']}* :sparkles:"
@@ -39,10 +32,9 @@ async def inspiration(interaction):
     await interaction.response.send_message(embed=embed_msg)
 
 
-# @tree.command(guild=test_guild, description="Create a poll with up to 5 choices.")
-# async def poll(interaction: Interaction):
-#     poll_modal = Modal(title="Create a Modal")
-#     await interaction.response.send_modal(poll_modal)
+@tree.command(guild=test_guild, description='Create a poll with up to 4 choices.')
+async def poll(interaction: Interaction) -> None:
+    await interaction.response.send_modal(Poll())
 
 
 client.run(TOKEN)
