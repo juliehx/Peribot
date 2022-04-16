@@ -10,14 +10,16 @@ from discord.app_commands import CommandTree
 from discord.ui import (
     Modal,
     TextInput,
-    Select,
+    Button,
+    View,
 )
 from discord import (
     Embed,
     Intents,
     Interaction,
     Client,
-    SelectOption
+    Emoji,
+    PartialEmoji
 )
 
 from poll import Poll

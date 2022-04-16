@@ -14,8 +14,8 @@ test_guild = discord.Object(id=GUILD)
 @client.event
 async def on_ready():
     print('Connected!')
-    # tree.remove_command("inspiration")
-    # tree.remove_command("poll")
+    tree.remove_command("inspiration")
+    tree.remove_command("poll")
     await tree.sync(guild=test_guild)
 
 
@@ -34,7 +34,7 @@ async def inspiration(interaction: Interaction) -> None:
 
 @tree.command(guild=test_guild, description='Create a poll with up to 4 choices.')
 async def poll(interaction: Interaction) -> None:
-    await interaction.response.send_modal(Poll())
+    await interaction.response.send_modal(Poll(client=client))
 
 
 client.run(TOKEN)
