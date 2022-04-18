@@ -16,6 +16,7 @@ async def on_ready():
     print('Connected!')
     tree.remove_command("inspiration")
     tree.remove_command("poll")
+    # print(tree.get_commands())
     await tree.sync(guild=test_guild)
 
 
