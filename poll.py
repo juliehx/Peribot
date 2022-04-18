@@ -2,8 +2,28 @@ from dependencies import *
 
 
 class PollButton(Button):
+    def __init__(self, user, custom_id, label):
+        super().__init__(custom_id=custom_id, label=label)
+        self.user = user
+
     async def callback(self, interaction):
-        await interaction.response.edit_message(content='button clicked', view=None)
+        message_embed = interaction.message.embeds[0]
+
+        new_embed = Embed(title=message_embed.title, colour=0xffe6a1)
+        new_embed.set_author(name=self.user.display_name+" is hosting a poll!", icon_url=self.user.avatar.url)
+        new_embed.add_field(name="Vote from these choices:", value="\u2014", inline=False)
+
+        for i, field in enumerate(message_embed.fields[1:]):
+            num_votes = int(field.value.split(' ')[0])
+            if self.label == str(i+1):
+                num_votes += 1
+
+            new_embed.add_field(name=field.name, value=f"{num_votes} votes", inline=False)
+
+        await interaction.response.edit_message(embed=new_embed)
+
+        followup_message = f"Thanks for voting in {self.user.display_name}'s poll: __{message_embed.title}__ !"
+        await interaction.followup.send(followup_message, ephemeral=True)
 
 
 class Poll(Modal, title="Create a Poll"):
@@ -27,32 +47,19 @@ class Poll(Modal, title="Create a Poll"):
     async def on_submit(self, interaction: Interaction) -> None:
         self.create_poll_embed_info(interaction.user, interaction.data)
         await interaction.response.send_message(embed=self.embed, view=self.view)
-        print(interaction.data)
-
-        def check(x):
-            print(x)
-            return True
-
-        # while True:
-        res = await self.client.wait_for(
-            'button_click',
-            check=check
-        )
-
-        await interaction.response.send_message("button clicked", ephemeral=True)
-#     print(res)
 
     async def on_error(self, error: Exception, interaction: Interaction) -> None:
         await interaction.response.send_message('Oops! Something went wrong.', ephemeral=True)
         traceback.print_tb(error.__traceback__)
 
-    def create_poll_embed_info(self, user, data):
+    def create_poll_embed_info(self, user, data) -> None:
         poll_info = {}
         poll_body = ""
 
         choice_num = 1
 
         self.view = View()
+        self.embed.add_field(name="Vote from these choices:", value="\u2014", inline=False)
 
         poll_title = ":bar_chart: "
         for component in data['components']:
@@ -66,13 +73,13 @@ class Poll(Modal, title="Create a Poll"):
                     poll_info[custom_id] = 0
 
                     if custom_id != "poll_title":
-                        poll_body += f":{self.numbers_emojis[choice_num]}: {value}\n"
-                        button = PollButton(custom_id=custom_id, label=f"{choice_num}")
+                        field_name = f":{self.numbers_emojis[choice_num]}: {value}"
+                        self.embed.add_field(name=field_name, value="0 votes", inline=False)
+
+                        button = PollButton(user=user, custom_id=custom_id, label=f"{choice_num}")
                         self.view.add_item(item=button)
+
                         choice_num += 1
 
         self.embed.title = poll_title
-        self.embed.set_author(name=user.display_name+" created a poll!", icon_url=user.avatar.url)
-        self.embed.add_field(name="Vote from these choices:", value=poll_body)
-
-        return {'number_emojis': self.numbers_emojis, 'poll_info': poll_info, 'num_choices': choice_num}
+        self.embed.set_author(name=user.display_name+" is hosting a poll!", icon_url=user.avatar.url)

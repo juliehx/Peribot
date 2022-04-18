@@ -19,7 +19,8 @@ from discord import (
     Interaction,
     Client,
     Emoji,
-    PartialEmoji
+    PartialEmoji,
+    AllowedMentions
 )
 
 from poll import Poll
