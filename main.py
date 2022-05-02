@@ -38,5 +38,9 @@ async def poll(interaction: Interaction) -> None:
     await interaction.response.send_modal(Poll(client=client))
 
 
+@tree.command(guild=test_guild, description='Create an event RSVP.')
+async def rsvp(interaction: Interaction) -> None:
+    await interaction.response.send_modal(Rsvp(client=client))
+
 client.run(TOKEN)
 

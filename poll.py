@@ -58,8 +58,7 @@ class Poll(Modal, title="Create a Poll"):
 
         choice_num = 1
 
-        # todo: define separate view or include timeout in bot help command
-        self.view = View(timeout=86400)
+        self.view = View(timeout=None)
         self.embed.add_field(name="Vote from these choices:", value="\u2014", inline=False)
 
         poll_title = ":bar_chart: "
