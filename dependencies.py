@@ -19,9 +19,9 @@ from discord import (
     Intents,
     Interaction,
     Client,
-    Emoji,
     PartialEmoji,
-    AllowedMentions
+    AllowedMentions,
+    ButtonStyle
 )
 
 from poll import Poll
