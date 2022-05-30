@@ -8,19 +8,14 @@ intents = Intents.all()
 client = Client(intents=intents)
 tree = CommandTree(client)
 
-test_guild = discord.Object(id=GUILD)
-
 
 @client.event
 async def on_ready():
     print('Connected!')
-    tree.remove_command("inspiration")
-    tree.remove_command("poll")
-    # print(tree.get_commands())
-    await tree.sync(guild=test_guild)
+    await tree.sync()
 
 
-@tree.command(guild=test_guild, description='Responds with a random inspirational quote.')
+@tree.command(description='Responds with a random inspirational quote.')
 async def inspiration(interaction: Interaction) -> None:
     request = requests.request('get', 'https://zenquotes.io?api=random')
     response = request.json()[0]
@@ -33,12 +28,12 @@ async def inspiration(interaction: Interaction) -> None:
     await interaction.response.send_message(embed=embed_msg)
 
 
-@tree.command(guild=test_guild, description='Create a poll with up to 4 choices.')
+@tree.command(description='Create a poll with up to 4 choices.')
 async def poll(interaction: Interaction) -> None:
     await interaction.response.send_modal(Poll(client=client))
 
 
-@tree.command(guild=test_guild, description='Create an event RSVP.')
+@tree.command(description='Create an event RSVP.')
 async def rsvp(interaction: Interaction) -> None:
     await interaction.response.send_modal(Rsvp(client=client))
 
