@@ -17,11 +17,11 @@ class RsvpButton(Button):
             rsvp_list = field.value.split('\n')
 
             if self.custom_id == 'accept_button':
-                new_value = self.edit_rsvp_list(rsvp_list, field.name, ':white_check_mark: Accepted')
+                new_value = self.edit_rsvp_list(interaction.user, rsvp_list, field.name, ':white_check_mark: Accepted')
             elif self.custom_id == 'decline_button':
-                new_value = self.edit_rsvp_list(rsvp_list, field.name, ':x: Declined')
+                new_value = self.edit_rsvp_list(interaction.user, rsvp_list, field.name, ':x: Declined')
             elif self.custom_id == 'tentative_button':
-                new_value = self.edit_rsvp_list(rsvp_list, field.name, ':grey_question: Tentative')
+                new_value = self.edit_rsvp_list(interaction.user, rsvp_list, field.name, ':grey_question: Tentative')
 
             new_embed.add_field(name=field.name, value=f"{new_value}", inline=field.inline)
 
@@ -30,16 +30,16 @@ class RsvpButton(Button):
         followup_message = f"Thanks for RSVP-ing to {self.user.display_name}'s event: __{message_embed.title}__ !"
         await interaction.followup.send(followup_message, ephemeral=True)
 
-    def edit_rsvp_list(self, rsvp_list, field_name, field_name_check):
+    def edit_rsvp_list(self, user, rsvp_list, field_name, field_name_check):
         if field_name == field_name_check:
             if "No one yet" in rsvp_list:
                 rsvp_list.remove("No one yet")
 
-            if self.user.display_name not in rsvp_list:
-                rsvp_list.append(self.user.display_name)
+            if user.display_name not in rsvp_list:
+                rsvp_list.append(user.display_name)
         else:
-            if self.user.display_name in rsvp_list:
-                rsvp_list.remove(self.user.display_name)
+            if user.display_name in rsvp_list:
+                rsvp_list.remove(user.display_name)
 
                 if not rsvp_list:
                     rsvp_list.append("No one yet")
@@ -47,7 +47,7 @@ class RsvpButton(Button):
         return "\n".join(rsvp_list)
 
 
-class Rsvp(Modal, title='Create and RSVP'):
+class Rsvp(Modal, title='Create an RSVP Event'):
     event_name = TextInput(custom_id="event_name", label="Event", placeholder="Event Name", max_length=200)
     description = TextInput(custom_id="event_description", label="Description", max_length=500)
     date = TextInput(custom_id="event_date", label="Date")
